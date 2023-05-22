@@ -1,4 +1,4 @@
-type Equipment =
+export type Equipment =
 	| 'body weight'
 	| 'cable'
 	| 'leverage machine'
@@ -28,9 +28,9 @@ type Equipment =
 	| 'elliptical machine'
 	| 'stepmill machine';
 
-type BodyPart = 'waist' | 'upper legs' | 'back' | 'lower legs' | 'chest' | 'upper arms' | 'cardio' | 'shoulders' | 'lower arms' | 'neck';
+export type BodyPart = 'waist' | 'upper legs' | 'back' | 'lower legs' | 'chest' | 'upper arms' | 'cardio' | 'shoulders' | 'lower arms' | 'neck';
 
-type Target =
+export type Target =
 	| 'abs'
 	| 'quads'
 	| 'lats'
@@ -58,11 +58,4 @@ export interface Exercise {
 	id: string;
 	name: string;
 	target: Target;
-}
-
-export interface ExerciseFilters {
-	bodyPart: BodyPart[];
-	equipment: Equipment[];
-	target: Target[];
-	name: string;
 }

@@ -1,10 +1,14 @@
-import {ExerciseList} from "@/app/exerciseList";
+'use client';
+import { RootStoreProvider, setupRootStore } from '../../stores';
+import { ExerciseContainer } from '@/components';
 
 export default function Home() {
-  
-  return (
-    <main>
-       <ExerciseList />
-    </main>
-  )
+	const rootStore = setupRootStore();
+	return (
+		<main>
+			<RootStoreProvider value={rootStore}>
+				<ExerciseContainer />
+			</RootStoreProvider>
+		</main>
+	);
 }
