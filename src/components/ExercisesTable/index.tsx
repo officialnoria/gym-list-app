@@ -1,9 +1,9 @@
 import { observer } from 'mobx-react-lite';
-import { Box, Image, Text } from '@chakra-ui/react';
-import DataTable, { TableColumn } from 'react-data-table-component';
+import { Box, Center, Image, Spinner, Text } from '@chakra-ui/react';
+import DataTable, { ExpanderComponentProps, TableColumn } from 'react-data-table-component';
 import { useStores } from '../../../stores';
 import { Exercise } from '../../../interfaces/exercise';
-import { uppercaseEachWord } from '../../../utils';
+import { uppercaseEachWord, wait } from '../../../utils';
 import { useCallback, useEffect, useState } from 'react';
 import data from '../../../public/exercises.json';
 
@@ -21,11 +21,6 @@ const columns: TableColumn<Exercise>[] = [
 		sortable: true,
 	},
 	{
-		name: 'Image',
-		selector: (row) => row.gifUrl,
-		cell: (row) => <Image src={row.gifUrl} alt={row.name} width={360} height={360} />,
-	},
-	{
 		name: 'Name',
 		selector: (row) => row.name,
 		cell: (row) => <Text>{uppercaseEachWord(row.name)}</Text>,
@@ -39,42 +34,44 @@ const columns: TableColumn<Exercise>[] = [
 	},
 ];
 
-const transitionProp = 'all 0.5s ease-in-out';
+const expandableRowComponent = ({ data }: ExpanderComponentProps<Exercise>) => {
+	return (
+		<Center w={'100%'} my={'20px'}>
+			<Image src={data.gifUrl} alt={data.name} w={360} h={360} />
+		</Center>
+	);
+};
 
 const sortExercises = (ex: Exercise[]) => {
 	return ex.sort((a, b) => parseInt(a.id) - parseInt(b.id));
 };
 
 export const ExercisesTable = observer(() => {
-	const { appStore, filterStore } = useStores();
+	const { filterStore } = useStores();
 
 	const [filteredExercises, setFilteredExercises] = useState<Exercise[]>(data as Exercise[]);
+
+	const [tableLoading, setTableLoading] = useState(true);
 
 	const filter = useCallback(() => {
 		let results = data as Exercise[];
 
 		if (filterStore.bodyPart.length > 0) {
-			for (const bodyPartElement of filterStore.bodyPart) {
-				results = results.filter((exercise) => {
-					return exercise.bodyPart === bodyPartElement;
-				});
-			}
+			results = results.filter((exercise) => {
+				return filterStore.bodyPart.includes(exercise.bodyPart);
+			});
 		}
 
 		if (filterStore.equipment.length > 0) {
-			for (const equipmentElement of filterStore.equipment) {
-				results = results.filter((exercise) => {
-					return exercise.equipment === equipmentElement;
-				});
-			}
+			results = results.filter((exercise) => {
+				return filterStore.equipment.includes(exercise.equipment);
+			});
 		}
 
 		if (filterStore.target.length > 0) {
-			for (const targetElement of filterStore.target) {
-				results = results.filter((exercise) => {
-					return exercise.target === targetElement;
-				});
-			}
+			results = results.filter((exercise) => {
+				return filterStore.target.includes(exercise.target);
+			});
 		}
 
 		if (filterStore.name.length > 0) {
@@ -84,15 +81,39 @@ export const ExercisesTable = observer(() => {
 		}
 
 		setFilteredExercises(sortExercises(results));
-	}, [filterStore.bodyPart, filterStore.equipment, filterStore.name, filterStore.target]);
+	}, [filterStore.bodyPart.length, filterStore.equipment.length, filterStore.name, filterStore.target.length]);
 
 	useEffect(() => {
 		filter();
 	}, [filter]);
 
+	useEffect(() => {
+		setTableLoading(true);
+		wait(500).then(() => setTableLoading(false));
+	}, []);
+
+	if (tableLoading) {
+		return (
+			<Center boxSize={'100%'}>
+				<Spinner color={'yellow.500'} size={'xl'} />
+			</Center>
+		);
+	}
+
 	return (
-		<Box w={appStore.filtersMenuOpen ? '70vw' : '100vw'} transition={transitionProp}>
-			<DataTable responsive columns={columns} data={filteredExercises} pagination theme={'dark'} />
+		<Box w={'100%'}>
+			<DataTable
+				paginationPerPage={25}
+				paginationRowsPerPageOptions={[25, 50, 100, 200]}
+				expandOnRowClicked
+				expandableRows
+				expandableRowsComponent={expandableRowComponent}
+				responsive
+				columns={columns}
+				data={filteredExercises}
+				pagination
+				theme={'dark'}
+			/>
 		</Box>
 	);
 });

@@ -11,28 +11,28 @@ export const FilterStoreModel = types
 		name: types.optional(types.string, ''),
 	})
 	.actions((self) => ({
-		addBodyPart(bodyPart: TSBodyPart) {
-			self.bodyPart.push(bodyPart);
+		addBodyPartFilters(bodyPart: TSBodyPart[]) {
+			self.bodyPart.replace(bodyPart);
 		},
 
-		removeBodyPart(bodyPart: TSBodyPart) {
-			self.bodyPart.remove(bodyPart);
+		clearBodyPartFilters() {
+			self.bodyPart.clear();
 		},
 
-		addEquipment(equipment: TSEquipment) {
-			self.equipment.push(equipment);
+		addEquipmentFilters(equipment: TSEquipment[]) {
+			self.equipment.replace(equipment);
 		},
 
-		removeEquipment(equipment: TSEquipment) {
-			self.equipment.remove(equipment);
+		clearEquipmentFilters() {
+			self.equipment.clear();
 		},
 
-		addTarget(target: TSTarget) {
-			self.target.push(target);
+		addTargetFilters(target: TSTarget[]) {
+			self.target.replace(target);
 		},
 
-		removeTarget(target: TSTarget) {
-			self.target.remove(target);
+		clearTargetFilters() {
+			self.target.clear();
 		},
 
 		setName(name: string) {

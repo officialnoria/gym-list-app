@@ -3,3 +3,4 @@ export * from './ExerciseContainer';
 export * from './ExercisesTable';
 export * from './SearchBar';
 export * from './Table';
+export * from './Filters';
